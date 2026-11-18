@@ -1,0 +1,196 @@
+[colors]
+background = #121212
+foreground = #FFFFFF
+active     = #FFFFFF
+inactive   = #555555
+alert      = #FF5555
+transparan = #a0000000
+
+[bar/main]
+fixed-center = true
+width = 88%
+height = 25
+radius = 5
+bottom = false
+offset-x = 5%
+offset-y = 5
+
+background = ${colors.transparan}
+foreground = ${colors.transparan}
+
+line-size = 0
+
+padding-left = 2
+padding-right = 2
+module-margin-left = 2
+module-margin-right = 2
+
+# Font default dan font untuk simbol dot bulat
+font-0 = "JetBrainsMono Nerd Font:style=Regular:size=10;2"
+#font-1 = "Noto Sans:size=10;2"
+font-1 = "JetBrainsMono Nerd Font:style=Regular:size=10;2"
+
+modules-left = bspwm xworkspaces
+modules-center = musik musikplayer
+modules-right = clock wireless-network pulseaudio battery powermenu
+
+cursor-click = pointer
+cursor-scroll = ns-resize
+
+enable-ipc = true
+
+[module/xworkspaces]
+type = internal/bspwm
+
+# Mengizinkan penataan custom untuk tiap nomor desktop
+inline-mode = false
+pin-workspaces = true
+
+# Tampilan standar saat workspace FOCUSED (sedang dibuka/aktif)
+label-focused = ●
+label-focused-foreground = ${colors.active}
+label-focused-padding = 1
+
+# Tampilan saat workspace OCCUPIED (ada aplikasi di dalamnya)
+label-occupied = ○
+label-occupied-foreground = ${colors.foreground}
+label-occupied-padding = 1
+
+# Tampilan saat ada notifikasi URGENT
+label-urgent = ●
+label-urgent-foreground = ${colors.alert}
+label-urgent-padding = 1
+
+# --- BAGIAN KUNCI UNTUK WORKSPACE KOSONG ---
+
+# Untuk workspace 1-5: Jika KOSONG, tetep TAMPILKAN dot bulat kosong (○)
+label-empty = ○
+label-empty-foreground = ${colors.inactive}
+label-empty-padding = 1
+
+# Untuk workspace 6, 7, 8, 9: Jika KOSONG, SEMBUNYIKAN (tidak tampil apa-apa)
+# Kita paksa nilainya kosong khusus untuk nomor 6 sampai 9
+label-empty-6 = 
+label-empty-7 = 
+label-empty-8 = 
+label-empty-9 = 
+
+[module/musikplayer]
+type = custom/script
+
+# Memeriksa kata 'playing'. Jika tidak ada, PASTI memunculkan teks kustom Anda.
+exec = sh -c "while true; do if mpc status 2>/dev/null | grep -q 'playing'; then mpc current; else echo 'Nothing Here . .'; fi; sleep 1; done"
+tail = true
+
+label = %output%
+label-maxlen = 40
+label-foreground = #FFFFFF
+
+[module/musik]
+type = internal/mpd
+host = 127.0.0.1
+port = 6600
+
+format-online = <label-song>
+label-song = %title% 
+#- %artist%
+label-song-maxlen = 40
+label-song-foreground = #FFFFFF
+
+# --- KATA KATA KUSTOM SAAT MUSIK MATI ---
+format-paused = <label-paused>
+label-paused = Nothing Here . .
+label-paused-foreground = #FFFFFF
+
+format-stopped = <label-stopped>
+label-stopped = Lagi ga dengerin musik
+label-stopped-foreground = #FFFFFF
+
+format-offline = <label-offline>
+label-offline = Nothing Here . .
+label-offline-foreground = #FFFFFF
+
+[module/wireless-network]
+type = internal/network
+# Sesuaikan interface dengan nama card wifi Anda (cek lewat perintah 'ip link')
+interface = wlp2s0
+interface-type = wireless
+interval = 3.0
+
+format-connected = <label-connected>
+label-connected = %essid%
+label-connected-foreground = ${colors.foreground}
+
+format-disconnected = <label-disconnected>
+label-disconnected = Disconnected
+label-disconnected-foreground = ${colors.inactive}
+
+[module/pulseaudio]
+type = internal/pulseaudio
+# Jika menggunakan Pipewire/PulseAudio modern, gunakan internal/pulseaudio
+# type = internal/pulseaudio
+
+format-volume = <label-volume>
+label-volume = VOL %percentage%%
+label-volume-foreground = ${colors.foreground}
+
+format-muted = <label-muted>
+label-muted = MUTED
+label-muted-foreground = ${colors.inactive}
+
+[module/battery]
+type = internal/battery
+battery = BAT0
+adapter = ADP1
+full-at = 99
+low-at = 15
+
+format-charging = <label-charging>
+label-charging = CHR %percentage%%
+label-charging-foreground = ${colors.foreground}
+
+format-discharging = <label-discharging>
+label-discharging = BAT %percentage%%
+label-discharging-foreground = ${colors.foreground}
+
+format-full = <label-full>
+label-full = FULL %percentage%%
+label-full-foreground = ${colors.foreground}
+
+[module/cava]
+type = custom/script
+tail = true
+
+# Menjalankan skrip pembantu eksternal yang aman
+exec = ~/.config/polybar/cava.sh
+
+label-foreground = #FFFFFF
+label = %output%
+
+[module/clock]
+type = internal/date
+interval = 1.0
+
+date = %I:%M:%S %p
+date-alt = %A, %d %B %Y
+
+format = <label>
+format-foreground = #ffffff
+format-padding = 2
+label = "%date%"
+label-font = 1
+
+[module/powermenu]
+type = custom/text
+content = " ⏼ "
+content-foreground = #ffffff
+content-padding = 1
+click-left = ~/.config/rofi/powermenu.sh
+
+[module/memory]
+type = internal/memory
+interval = 3
+format = <label>
+format-prefix = "RAM "
+format-prefix-foreground = #ffffff
+label = %percentage_used%

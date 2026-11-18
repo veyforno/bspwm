@@ -1,0 +1,197 @@
+#
+# wm independent hotkeys
+#
+
+# terminal emulator
+super + Return
+	kitty
+
+# program launcher
+super + @space
+	rofi -show drun
+super + b
+	firefox
+super + e
+	dolphin
+super + ctrl + b
+	brave
+
+# make sxhkd reload its configuration files:
+super + ctrl + Escape
+	pkill -USR1 -x sxhkd
+
+#Sekerinsut
+Print
+#	flameshot gui
+	scrot '%Y-%m-%d-%H%M%S.png' -e 'mkdir -p ~/Pictures && mv $f ~/Pictures && xclip -selection clipboard -t image/png -i ~/Pictures/$f'
+
+shift + Print
+	scrot -s '%Y-%m-%d-%H%M%S.png' -e 'mkdir -p ~/Pictures && mv $f ~/Pictures && xclip -selection clipboard -t image/png -i ~/Pictures/$f'
+
+#reload polybar
+super + ctrl + p
+	killall polybar; polybar &
+
+#reload picom
+super + ctrl + i
+	killall picom; picom &
+
+#ganti wallpaper
+super + ctrl + shift + w
+	~/.local/bin/rofi-wallpaper.sh
+
+#lockscreen
+super + ctrl + shift + l
+	~/.local/bin/lockscreen-wallpaper.sh
+
+#power off
+super + Escape
+	~/.config/rofi/powermenu.sh
+
+#wifian
+
+#lagu + fetch
+super + ctrl + m
+    	bspc rule -a RMPC_TUI -o state=floating rectangle=666x666+240+111; \
+    	bspc rule -a Cava -o state=floating rectangle=666x666+1111+111; \
+	bspc rule -a fetch -o state=floating rectangle=999x222+555+844; \
+   	kitty --class RMPC_TUI -e rmpc & \
+	kitty --class Cava -e cava & \
+	kitty --class fetch -e ~/fetchku/myfetch3
+
+#lockscreen
+super + shift + l
+  betterlockscreen -l dimblur --fx fade
+
+#
+# bspwm hotkeys
+#
+
+# ganti layout bspwm
+super + shift + space
+    bsp-layout next --layouts tall,rtall,wide,rwide,grid,rgrid,even,tiled,monocle
+
+super + shift + alt + space
+    bsp-layout previous --layouts tall,rtall,wide,rwide,grid,rgrid,even,tiled,monocle
+
+super + alt + d
+    bsp-layout remove
+
+
+#window jadi float dan ketenga
+super + f
+	bspc node -t ~floating
+
+#mengatur volume
+super + v
+    wpctl set-volume @DEFAULT_AUDIO_SINK@ $(rofi -dmenu -p "Set Volume:")%
+
+#mengatur brightness
+super + alt + b
+    brightnessctl set $(rofi -dmenu -p "Set Brightness (0-100):")%
+
+# quit/restart bspwm
+super + r
+	bspc wm -r
+
+# close and kill
+super + w
+	bspc node -{c,k}
+
+# alternate between the tiled and monocle layout
+super + m
+	bspc desktop -l next
+
+# send the newest marked node to the newest preselected node
+super + y
+	bspc node newest.marked.local -n newest.!automatic.local
+
+# swap the current node and the biggest window
+super + g
+	bspc node -s biggest.window
+
+#
+# state/flags
+#
+
+# set the window state
+super + {t,shift + t,s}
+	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+
+# set the node flags
+super + ctrl + {x,y,z,q}
+	bspc node -g {locked,sticky,private,marked}
+
+#
+# focus/swap
+#
+
+# focus the node in the given direction
+ctrl + {h,j,k,l}
+	bspc node -f {west,south,north,east}
+
+# focus the node for the given path jump
+super + {p,comma,period}
+	bspc node -f @{parent,brother,first,second}
+
+# focus the next/previous window in the current desktop
+super + shift + f
+	bspc node -f {next,prev}.local.!hidden.window
+
+# focus the next/previous desktop in the current monitor
+super + bracket{left,right}
+	bspc desktop -f {prev,next}.local
+
+# focus the last node/desktop
+super + {grave,Tab}
+	bspc {node,desktop} -f last
+
+# focus the older or newer node in the focus history
+super + {o,i}
+	bspc wm -h off; \
+	bspc node {older,newer} -f; \
+	bspc wm -h on
+
+# focus or send to the given desktop
+super + {1-9,0}
+	bspc desktop -f '^{1-9,10}'
+
+ctrl + {1-9,0}
+  bspc node -d '^{1-9,10}' --follow
+
+#
+# preselect
+#
+
+# preselect the direction
+super + ctrl + {h,j,k,l}
+	bspc node -p {west,south,north,east}
+
+# preselect the ratio
+super + ctrl + {1-9}
+	bspc node -o 0.{1-9}
+
+# cancel the preselection for the focused node
+super + ctrl + space
+	bspc node -p cancel
+
+# cancel the preselection for the focused desktop
+super + ctrl + shift + space
+	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
+
+#
+# move/resize
+#
+bspc config pointer_modifier mod4
+
+# expand a window by moving one of its side outward
+super + alt + {h,j,k,l}
+	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+
+# contract a window by moving one of its side inward
+super + alt + shift + {h,j,k,l}
+	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+
+# move a floating window
+super + alt + {Left,Down,Up,Right}
+	bspc node -v {-20 0,0 20,0 -20,20 0}
